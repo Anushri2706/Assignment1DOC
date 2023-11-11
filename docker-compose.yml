@@ -1,0 +1,33 @@
+version: "3.8"
+services:
+   db:
+       image: "postgres:14.1-bullseye"
+       restart: always
+       container_name: "doc-pgsql-container"
+       ports:
+         - 5432:5432
+       volumes:
+         - db:/var/lib/postgresql/data
+       environment:
+         - POSTGRES_DB=doc-db
+         - POSTGRES_USER=postgres
+         - POSTGRES_PASSWORD=password
+
+   backend:
+     image: 'docassignment'
+     build:
+       context: ./
+     container_name: 'storyapplication'
+     ports:
+       - 8080:8080
+     depends_on:
+       - db
+     environment:
+       - SPRING_DATASOURCE_URL= jdbc:postgresql://localhost:5432/postgres?currentSchema=public
+       - SPRING_DATASOURCE_USERNAME= postgres
+       - SPRING_DATASOURCE_PASSWORD= password
+       - SPRING_JPQ_HIBERNATE_DDL_AUTO= update
+
+volumes:
+  db:
+   driver: local
